@@ -3,18 +3,18 @@ const app = express();
 const bodyParser = require("body-parser");
 const port =3000;
 const cors=require('cors')
+const route=require('./Routes/routes')
+require('dotenv').config();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors())
 
-app.post('/user/signup', (req, res) => {
-    console.log('started');
-    console.log('-------------------------------------');
-    console.log('req.body',req.body);
-    console.log('-------------------------------------');
-});
+app.use('/user',route)
 
 app.listen(port, () => {
   console.log(`Server is running on ${port}`);
 });
+
+
+
