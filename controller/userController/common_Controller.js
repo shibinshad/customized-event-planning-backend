@@ -71,6 +71,7 @@ module.exports = {
               success: true,
               message: 'successfully register',
               token: token,
+              role,
             });
           });
     } catch (error) {
@@ -80,8 +81,9 @@ module.exports = {
   login: async (req, res) => {
     try {
       console.log(req.body);
-      const {username, password} = req.body;
-      const existingUser = await User.findOne({username});
+      const {usernameOrEmail, password} = req.body;
+      const existingUser = await User.findOne({username: usernameOrEmail});
+      console.log(existingUser);
       if (!existingUser) {
         return res.status(400).send('Invalid Credentials');
       }
@@ -95,7 +97,12 @@ module.exports = {
       const token = jwt.sign({id: existingUser._id}, process.env.SECRET_KEY, {
         expiresIn: '1h',
       });
-      res.json({token, message: 'login successfully', success: true});
+      res.json({
+        token,
+        message: 'login successfully',
+        success: true,
+        existingUser,
+      });
     } catch (err) {
       console.log(error);
     }
