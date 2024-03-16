@@ -4,7 +4,7 @@ const {S3Client} = require('@aws-sdk/client-s3');
 
 require('dotenv').config();
 
-const myBucket = process.env.customcraze;
+const myBucket = process.env.AWS_BUCKET;
 
 const region = process.env.AWS_REGION;
 

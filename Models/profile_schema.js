@@ -1,5 +1,6 @@
 const mongoose=require('mongoose');
 const userProfile=new mongoose.Schema({
+  userId: mongoose.Types.ObjectId,
   username: String,
   email: String,
   address: String,

@@ -9,18 +9,12 @@ const bcrypt = require('bcrypt');
 module.exports = {
   signup: async (req, res) => {
     try {
-      console.log(req.body);
-      console.log('-------------------------------------');
       const {mobileNumber} = req.body;
-      console.log('mele');
 
       await client.verify.v2
           .services(process.env.TWILIO_SERVICE_SID)
           .verifications.create({to: `+91 ${mobileNumber}`, channel: `sms`})
           .then((ress) => {
-            console.log('--------------------res--------------');
-            console.log(ress);
-            console.log('--------------------res--------------');
             res.json({
               success: true,
               message: 'OTP send successfully',
@@ -28,9 +22,6 @@ module.exports = {
             });
           })
           .catch((err) => {
-            console.log('--------------------err--------------');
-            console.log(err);
-            console.log('--------------------err--------------');
             res.json('false');
           });
     } catch (error) {
@@ -39,7 +30,6 @@ module.exports = {
   },
   verifyotp: async (req, res) => {
     try {
-      console.log(req.body);
       const {mobileNumber, email, username, password, role, iotp} = req.body;
       const codedPassword = await bcrypt.hash(password, 8);
 
@@ -50,7 +40,6 @@ module.exports = {
             code: `${iotp}`,
           })
           .then(async (verificationCheck) => {
-            console.log(verificationCheck.status);
             const newUser = new User({
               username,
               email,
@@ -61,12 +50,12 @@ module.exports = {
             await newUser.save();
             const secret = process.env.SECRET_KEY;
             const payload = {
+              id: newUser._id,
               username,
               email,
               mobileNumber,
             };
             const token = jwt.sign(payload, secret, {expiresIn: '1hr'});
-            console.log(token);
             res.json({
               success: true,
               message: 'successfully register',
@@ -80,10 +69,8 @@ module.exports = {
   },
   login: async (req, res) => {
     try {
-      console.log(req.body);
       const {usernameOrEmail, password} = req.body;
       const existingUser = await User.findOne({username: usernameOrEmail});
-      console.log(existingUser);
       if (!existingUser) {
         return res.status(400).send('Invalid Credentials');
       }
@@ -94,7 +81,10 @@ module.exports = {
       if (!validPassord) {
         return res.status(400).send('Invalid Password');
       }
-      const token = jwt.sign({id: existingUser._id}, process.env.SECRET_KEY, {
+      const payload = {
+        id: existingUser._id,
+      };
+      const token = jwt.sign(payload, process.env.SECRET_KEY, {
         expiresIn: '1h',
       });
       res.json({
@@ -102,6 +92,7 @@ module.exports = {
         message: 'login successfully',
         success: true,
         existingUser,
+        role: existingUser.role,
       });
     } catch (err) {
       console.log(error);
