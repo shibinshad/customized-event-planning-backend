@@ -42,8 +42,6 @@ const DecorationForm = async (req, res) => {
 };
 
 const locationForm = async (req, res) => {
-  console.log(req.body);
-  console.log(req?.file?.location);
   try {
     const file = req?.file?.location;
     const {Name, Description, price, type, category} = req?.body;
@@ -56,6 +54,7 @@ const locationForm = async (req, res) => {
       category,
     });
     await newService.save();
+    console.log(newService);
     res.json({success: true});
   } catch (err) {
     console.log('Error in catch block', err);
@@ -76,6 +75,7 @@ const mediaForm = async (req, res) => {
       category,
     });
     await newService.save();
+    console.log(newService);
     res.json({success: true});
   } catch (err) {
     console.log('Error in catch block', err);
@@ -83,10 +83,30 @@ const mediaForm = async (req, res) => {
   }
 };
 
+const deleteService = async (req, res) => {
+  try {
+    const id = req.params.id;
+    await Services.findByIdAndDelete(id);
+  } catch (err) {
+    console.log(err);
+  }
+};
 
+const updateMedia = async (req, res)=>{
+  console.log(req.body);
+};
+
+const getDetails = async (req, res)=>{
+  const id = req.params.id;
+  console.log(id);
+  
+};
 module.exports = {
   cateringForm,
   DecorationForm,
   locationForm,
   mediaForm,
+  deleteService,
+  updateMedia,
+  getDetails,
 };
