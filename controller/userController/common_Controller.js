@@ -55,7 +55,7 @@ module.exports = {
               email,
               mobileNumber,
             };
-            const token = jwt.sign(payload, secret, {expiresIn: '1hr'});
+            const token = jwt.sign(payload, secret, {expiresIn: '1d'});
             res.json({
               success: true,
               message: 'successfully register',
@@ -85,7 +85,7 @@ module.exports = {
         id: existingUser._id,
       };
       const token = jwt.sign(payload, process.env.SECRET_KEY, {
-        expiresIn: '1h',
+        expiresIn: '1d',
       });
       res.json({
         token,

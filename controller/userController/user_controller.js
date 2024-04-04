@@ -8,12 +8,12 @@ const service = require('../../Models/serviceSchema');
 
 const updateProfile = async (req, res) => {
   // Validate input data (consider using a validation library)
-  if (!mongoose.Types.ObjectId.isValid(req.tokens.id)) {
+  if (!mongoose.Types.ObjectId.isValid(req.tockens.id)) {
     return res.status(400).json({error: 'Invalid user ID'});
   }
 
   // eslint-disable-next-line new-cap
-  const userId = mongoose.Types.ObjectId(req.tokens.id);
+  const userId = new mongoose.Types.ObjectId(req.tockens.id);
   const {username, email, phone, address, bio, dob} = req.body;
 
   try {
@@ -45,7 +45,7 @@ const updateProfile = async (req, res) => {
 
 const show = async (req, res) => {
   try {
-    const userId = new mongoose.Types.ObjectId(req.tokens.id);
+    const userId = new mongoose.Types.ObjectId(req.tockens.id);
 
     // Perform aggregation with proper error handling
     const user = await User.aggregate([
