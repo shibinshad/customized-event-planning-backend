@@ -59,7 +59,10 @@ const blockUser = async (req, res) => {
     if (!user) {
       return res.status(404).json({error: 'User not found'});
     }
-    await Users.updateOne({_id: userId}, {$set: {isBlocked: newBlockStatus}});
+    await Users.updateOne(
+        {_id: userId},
+        {$set: {isBlocked: newBlockStatus}},
+    );
     if (newBlockStatus == true) {
       res.status(200).json({message: 'User blocked successfully'});
     } else {
@@ -70,7 +73,6 @@ const blockUser = async (req, res) => {
     res.status(500).json({error: 'An unexpected error occurred'});
   }
 };
-
 
 const RemoveUser = async (req, res) => {
   try {
@@ -88,10 +90,28 @@ const RemoveUser = async (req, res) => {
   }
 };
 
+const getPending = async (req, res) => {
+  try {
+    const pendingUsers = await Users.find({isVerified: false});
+
+    res.json({pendingUsers});
+  } catch (error) {
+    console.error('Error while fetching pending users:', error);
+    res.status(500).json({error: 'Internal server error'});
+  }
+};
+
+const approveUser = async (req, res) => {
+  const userId = req.body.userId;
+  console.log(userId);
+  await Users.updateOne({_id: userId}, {$set: {isVerified: true}});
+};
 
 module.exports = {
   getUsers,
   getAgency,
   blockUser,
   RemoveUser,
+  getPending,
+  approveUser,
 };

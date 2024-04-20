@@ -11,6 +11,8 @@ route.get('/locations', userid, user.getLocations);
 route.get('/catering', userid, user.getcatering);
 route.get('/media', userid, user.getmedia);
 route.get('/decorations', userid, user.getdecorations);
+route.post('/addToCart', userid, user.addToCart);
+route.get('/orders', userid, user.orders);
 
 module.exports = route;
 

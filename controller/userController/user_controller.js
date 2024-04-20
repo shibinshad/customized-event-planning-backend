@@ -4,8 +4,7 @@ const mongoose = require('mongoose');
 const UserProfile = require('../../Models/profile_schema');
 const User = require('../../Models/Users');
 const service = require('../../Models/serviceSchema');
-
-
+const Cart = require('../../Models/cartSchema');
 const updateProfile = async (req, res) => {
   // Validate input data (consider using a validation library)
   if (!mongoose.Types.ObjectId.isValid(req.tockens.id)) {
@@ -97,7 +96,7 @@ const getmedia = async (req, res) => {
     console.log(err);
   }
 };
-const getdecorations= async (req, res) => {
+const getdecorations = async (req, res) => {
   try {
     const decorations = await service.find({category: 'Decoration'});
     res.json({decorations});
@@ -105,7 +104,69 @@ const getdecorations= async (req, res) => {
     console.log(err);
   }
 };
+const addToCart = async (req, res) => {
+  try {
+    const userId = req.tockens.id;
+    const id = req.body.data;
 
+    // Check if the item is already in the cart
+    const isAlreadyInCart = await Cart.findOne({
+      userId: userId,
+      selectedId: id,
+    });
+
+    // If the item is already in the cart, remove it
+    if (isAlreadyInCart) {
+      const updatedCart = await Cart.findOneAndUpdate(
+          {userId: userId},
+          {$pull: {selectedId: id}},
+          {new: true},
+      );
+      console.log(updatedCart);
+      return res
+          .status(200)
+          .json({message: 'Item removed from cart successfully', updatedCart});
+    }
+
+    // If the item is not in the cart, add it
+    const updatedCart = await Cart.findOneAndUpdate(
+        {userId: userId},
+        {$addToSet: {selectedId: id}},
+        {upsert: true, new: true},
+    );
+    console.log(updatedCart);
+    res
+        .status(200)
+        .json({message: 'Item added to cart successfully', updatedCart});
+  } catch (error) {
+    console.error('Error adding/removing item to/from cart:', error);
+    res.status(500).json({error: 'Internal Server Error'});
+  }
+};
+
+const orders = async (req, res) => {
+  const userId = new mongoose.Types.ObjectId(req.tockens.id);
+  const orders = await Cart.aggregate([
+    {$match: {userId: userId}},
+    // {
+    //   $lookup: {
+    //     from: 'users',
+    //     localField: 'userId',
+    //     foreignField: '_id',
+    //     as: 'users',
+    //   },
+    // },
+    {
+      $lookup: {
+        from: 'services',
+        localField: 'selectedId',
+        foreignField: '_id',
+        as: 'products',
+      },
+    },
+  ]);
+  res.json({orders});
+};
 
 module.exports = {
   updateProfile,
@@ -114,4 +175,6 @@ module.exports = {
   getcatering,
   getmedia,
   getdecorations,
+  addToCart,
+  orders,
 };
