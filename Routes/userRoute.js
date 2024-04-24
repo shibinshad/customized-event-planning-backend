@@ -13,6 +13,8 @@ route.get('/media', userid, user.getmedia);
 route.get('/decorations', userid, user.getdecorations);
 route.post('/addToCart', userid, user.addToCart);
 route.get('/orders', userid, user.orders);
+route.post('/createOrder', userid, user.createOrder);
+route.post('/successPayment', userid, user.successPayment);
 
 module.exports = route;
 

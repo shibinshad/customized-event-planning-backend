@@ -5,6 +5,10 @@ const UserProfile = require('../../Models/profile_schema');
 const User = require('../../Models/Users');
 const service = require('../../Models/serviceSchema');
 const Cart = require('../../Models/cartSchema');
+const razorPay = require('../../utilities/razorPay');
+const razorpay = require('../../utilities/razorPay');
+const paymentSchema = require('../../Models/paymentSchema');
+
 const updateProfile = async (req, res) => {
   // Validate input data (consider using a validation library)
   if (!mongoose.Types.ObjectId.isValid(req.tockens.id)) {
@@ -168,6 +172,41 @@ const orders = async (req, res) => {
   res.json({orders});
 };
 
+const createOrder = async (req, res) => {
+  try {
+    const {price} = req.body;
+    razorpay.orders
+        .create({
+          amount: price * 100,
+          currency: 'INR',
+          receipt: 'receipt' + Math.random().toString(36).substring(2, 15),
+        })
+        .then((order) => {
+          res.json(order);
+        })
+        .catch((error) => {
+          res.json(error);
+        });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const successPayment = async (req, res) => {
+  const userId = req.tockens.id;
+  console.log(req.body);
+  const paymentId = req.body.data.razorpay_payment_id;
+  const orderId = req.body.data.razorpay_order_id;
+  const signature = req.body.data.razorpay_signature;
+
+  await paymentSchema({
+    userId,
+    orderId: orderId,
+    paymentId: paymentId,
+    signature: signature,
+  }).save();
+};
+
 module.exports = {
   updateProfile,
   show,
@@ -177,4 +216,6 @@ module.exports = {
   getdecorations,
   addToCart,
   orders,
+  createOrder,
+  successPayment,
 };

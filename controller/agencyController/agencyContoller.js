@@ -134,10 +134,10 @@ const updateMedia = async (req, res) => {
 const getDetails = async (req, res) => {
   try {
     console.log(req.params.id);
-    // const id = new mongoose.Types.ObjectId(req.params.id);
-    // console.log(id);
-    // const user = await Service.findById(id);
-    // res.json(user);
+    const id = new mongoose.Types.ObjectId(req.params.id);
+    console.log(id);
+    const user = await Service.findById(id);
+    res.json(user);
   } catch (error) {
     console.log('sudais');
     console.log('Error in getting details', error);
