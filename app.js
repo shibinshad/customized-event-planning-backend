@@ -14,8 +14,14 @@ const userRoute = require('./Routes/userRoute');
 const agencyRoute = require('./Routes/agencyRoute');
 const adminRoute = require('./Routes/adminRoute');
 
-
-mongoose.connect(process.env.MONGODB_URL);
+mongoose
+    .connect(process.env.MONGODB_URL)
+    .then(() => {
+      console.log('database connected');
+    })
+    .catch((err) => {
+      console.log('database connection error', err);
+    });
 
 app.use('/', commoRoutes);
 app.use('/user', userRoute);
